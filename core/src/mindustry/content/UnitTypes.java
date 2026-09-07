@@ -1038,11 +1038,11 @@ public class UnitTypes{
 
         flare = new UnitType("flare"){{
             researchCostMultiplier = 0.5f;
-            speed = 1.8f;
+            speed = 2.7f;
             accel = 0.08f;
             drag = 0.04f;
             flying = true;
-            health = 52;
+            health = 35;
             engineOffset = 5.75f;
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
             hitSize = 9;
@@ -1081,8 +1081,8 @@ public class UnitTypes{
         }};
 
         horizon = new UnitType("horizon"){{
-            health = 255;
-            speed = 1.1f;
+            health = 170;
+            speed = 1.65f;
             accel = 0.08f;
             drag = 0.03f;
             flying = true;
@@ -1121,17 +1121,17 @@ public class UnitTypes{
                     hitEffect = Fx.flakExplosion;
                     shootEffect = Fx.none;
                     smokeEffect = Fx.none;
+
                     status = StatusEffects.blasted;
                     statusDuration = 60f;
                     damage = splashDamage * 0.5f;
-                    
                 }};
             }});
         }};
 
         zenith = new UnitType("zenith"){{
-            health = 550;
-            speed = 1.2f;
+            health = 500;
+            speed = 1.7f;
             accel = 0.04f;
             drag = 0.016f;
             flying = true;
@@ -1415,7 +1415,7 @@ public class UnitTypes{
 
             mineTier = 3;
             mineSpeed = 4f;
-            health = 460;
+            health = 400;
             armor = 3f;
             speed = 2.5f;
             accel = 0.06f;
