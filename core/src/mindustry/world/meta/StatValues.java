@@ -225,6 +225,16 @@ public class StatValues{
         return withTooltip(element, content, false);
     }
 
+    /** Displays the chance for status effects */
+    public static String statusText(StatusEffect status, float duration, float chance){
+        return (chance < 1f ? Core.bundle.format("stat.chance", Strings.autoFixed(chance * 100f, 4)) : "") +
+        (status.hasEmoji() ? status.emoji() + " " : "") +
+        "[stat]" + status.localizedName +
+        (status.reactive ? "" :
+        "[lightgray] ~ [stat]" + Strings.autoFixed(duration / 60f, 1) +
+        "[lightgray] " + Core.bundle.get("unit.seconds"));
+    }
+
     /** Displays an item with a specified amount. */
     private static Stack stack(TextureRegion region, int amount, @Nullable UnlockableContent content, boolean tooltip){
         Stack stack = new Stack();
@@ -713,15 +723,23 @@ public class StatValues{
                         sep(bt, "@bullet.homing");
                     }
 
+                    // Showing the correct value for lightning damage is annoyinh
                     if(type.lightning > 0){
-                        sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
+                        sep(bt, Core.bundle.format(
+                        "bullet.lightning",
+                        type.lightning,
+                        type.lightningDamage < 0 ? type.damage : type.lightningDamage
+                        ));
                     }
 
                     if(type instanceof LaserBulletType b && b.lightningSpacing > 0){
                         int count = (int)(b.length / b.lightningSpacing) * 2 + 2;
                         float damage = b.lightningDamage < 0 ? b.damage : b.lightningDamage;
                         sep(bt, Core.bundle.format("bullet.lightning", count, damage));
-                        note(bt, Core.bundle.format("bullet.lightninginterval", Strings.autoFixed(b.lightningSpacing / tilesize, 2), Strings.autoFixed(b.lightningLength, 2))).left();
+                        String length = b.lightningLengthRand > 0 ?
+                            Strings.format("@[]-[stat]@", Strings.autoFixed(b.lightningLength, 2), Strings.autoFixed(b.lightningLength + b.lightningLengthRand, 2))
+                            : Strings.autoFixed(b.lightningLength, 2);
+                        note(bt, Core.bundle.format("bullet.lightninginterval", Strings.autoFixed(b.lightningSpacing / tilesize, 2), length)).left();
                     }
 
                     if(type instanceof EmpBulletType b && b.radius > 0f){
@@ -778,9 +796,10 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.suppression", Strings.autoFixed(type.suppressionDuration / 60f, 2), Strings.fixed(type.suppressionRange / tilesize, 1)));
                     }
 
-                    if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.hasEmoji() ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" +
-                            Strings.autoFixed(type.statusDuration / 60f, 1) + "[lightgray] " + Core.bundle.get("unit.seconds"))).with(c -> withTooltip(c, type.status));
+                    // It is redundant to show the status effect if it can't be applied
+                    if(type.status != StatusEffects.none && type.statusChance > 0f){
+                        sep(bt, statusText(type.status, type.statusDuration, type.statusChance))
+                        .with(c -> withTooltip(c, type.status));
                     }
 
                     if(!type.targetMissiles){
